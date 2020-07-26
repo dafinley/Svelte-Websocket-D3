@@ -1,0 +1,14 @@
+.center { text-align:center; }
+
+.chart {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+
+.padding-space {
+  padding: 2rem;
+}
