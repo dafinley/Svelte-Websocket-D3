@@ -13,7 +13,8 @@ const listen = () => {
 const message = () => {
   // Listen for messages
   socket.addEventListener('message', function (event) {
-    messageStore.set(event.data);
+    console.log('event')
+    messageStore.set(JSON.parse(event.data));
   });
 }
 

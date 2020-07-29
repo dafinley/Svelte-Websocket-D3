@@ -6,19 +6,32 @@
 	let message;
 	let messages = [];
 	let el;
+	let unsubscribe;
 
 	onMount(() => {
-		store.subscribe(currentMessage => {
-				messages = [...messages, currentMessage];
+		unsubscribe = store.subscribe(m => {
+		  if(m){
+		    messages = [...messages, m.message];
+		  }
+		    
 		})
 
 		redrawD3();
 	})
 
-	$: if(messages.length > 0){
-	  console.log('runing in joint');
+	$: if(orderedMessages.length > 0){
 	  redrawD3();
 	}
+
+	$: orderedMessages = Object.entries(messages.reduce((acc, curr) => {
+	  if(!acc[curr.toLowerCase()]){
+	    acc[curr.toLowerCase()] = 1;
+	  } else {
+	    acc[curr.toLowerCase()] += 1;
+	  }
+
+	  return acc;
+	}, {}));
 	
 	function onSendMessage() {
 		 if (message.length > 0) {
@@ -28,31 +41,47 @@
 	}
 
 	function redrawD3() {
+	  console.log('ordered redraw', orderedMessages);
 	  d3.select(el).selectAll("div").remove();
 	  d3.select(el)
 			.selectAll("div")
-			.data([messages.length])
+			.data(orderedMessages)
 			.enter()
 			.append("div")
 			.style("width", function(d) {
-				return d + "px";
+				return +d[1] * 20 + "px";
 			})
 			.text(function(d) {
-				return d;
+				return d[0];
 			});
 	}
+
 </script>
 
-<div class='pure-u-1'>
+<div class='pure-g'>
 
-<h1 class='center'>Actual.ly Poll</h1>
-<div class="pure-u-1-2 padding-space">
-<div bind:this={el} class="chart center"></div>
+<div class="sidebar pure-u-1 pure-u-md-1-4">
+  <div class="header">
+    <h1 class="brand-title">Actual.ly</h1>
+    <h2 class="brand-tagline">Poll</h2>
+
+    <nav class="nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a class="pure-button" href="https://actual.ly/">Actually</a>
+      </li>
+    </ul>
+    </nav>
+  </div>
 </div>
+<div class="content pure-u-1 pure-u-md-3-4">
+<div bind:this={el} class="chart center"></div>
+
 <div class="pure-u-1-2 padding-space">
 {#each messages as message, i} <Message {message} /> {/each}
 </div>
 
+</div>
 </div>
 
 
